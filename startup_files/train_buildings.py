@@ -4,7 +4,7 @@ import torch.nn.functional as F
 from torch.utils.data import Subset
 import torchvision
 from model import CNN
-
+import torchvision.transforms as transforms
 from dataset import BuildingDataset
 
 import numpy as np
@@ -104,10 +104,27 @@ if __name__ == '__main__':
     resize = torchvision.transforms.Resize(size = (new_h, new_w))
     convert = torchvision.transforms.ConvertImageDtype(torch.float)
     
-    train_transforms = torchvision.transforms.Compose([resize, convert, normalize])
-    test_transforms = torchvision.transforms.Compose([resize, convert, normalize])
+    #train_transforms = torchvision.transforms.Compose([resize, convert, normalize])
+    #test_transforms = torchvision.transforms.Compose([resize, convert, normalize])
+    # Define data augmentation for training data
+    train_transforms = transforms.Compose([
+        transforms.RandomHorizontalFlip(),  # Randomly flip the image horizontally
+        transforms.RandomRotation(10),     # Randomly rotate the image by up to 10 degrees
+        transforms.RandomCrop(32, padding=4),  # Randomly crop with padding
+        transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2),  # Adjust brightness, etc.
+        transforms.ToTensor(),             # Convert image to tensor
+        transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])  # Normalize
+    ])
 
-    data_dir = '/gpfs/u/scratch/RNL2/shared/data'
+    # Define transforms for validation/test data (no augmentation here)
+    test_transforms = transforms.Compose([
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
+    ])    
+
+
+    #data_dir = '/gpfs/u/scratch/RNL2/shared/data'
+    data_dir = r'C:\Users\nievep\Downloads\Reinforcement Learning\Hw9\REPO\RL_HW9\startup_files\datasets\RPI_Buildings_Data\data'
     train_labels_dir = os.path.join(data_dir, 'train_labels.csv')
     val_labels_dir = os.path.join(data_dir, 'val_labels.csv')
 
@@ -125,10 +142,24 @@ if __name__ == '__main__':
     # #plt.imshow(torch.reshape(image, (new_h, new_w)), cmap='gray_r')
     # plt.show()
 
+    #more plotting:
+    # Display a few augmented training samples
+    # dataiter = iter(train_loader)
+    # images, labels = next(dataiter)
+
+    # # Unnormalize images for visualization
+    # images = images / 2 + 0.5  # Assuming mean=0.5, std=0.5 in normalization
+    # npimg = images.numpy()
+
+    # # Plot the images
+    # plt.figure(figsize=(8, 8))
+    # plt.imshow(np.transpose(npimg[:4], (1, 2, 0)))
+    # plt.show()
+
     # set training hyperparameters
     train_batch_size = 100
     test_batch_size = 100
-    n_epochs = 10
+    n_epochs = 30
     learning_rate = 1e-3
     seed = 100
     input_dim = (3, new_h, new_w)

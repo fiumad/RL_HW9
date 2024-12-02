@@ -6,6 +6,8 @@ from torch.utils.data import Subset
 import torch.optim as optim
 import torch.nn.functional as F
 import matplotlib.pyplot as plt
+import torchvision.transforms as transforms
+import os, sys
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -107,8 +109,25 @@ if __name__ == '__main__':
     momentum = 0.9
 
     normalize = torchvision.transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.225, 0.225, 0.225])
-    train_transforms = torchvision.transforms.Compose([torchvision.transforms.ToTensor(), normalize])
-    test_transforms = torchvision.transforms.Compose([torchvision.transforms.ToTensor(), normalize])
+    #train_transforms = torchvision.transforms.Compose([torchvision.transforms.ToTensor(), normalize])
+    #test_transforms = torchvision.transforms.Compose([torchvision.transforms.ToTensor(), normalize])
+    
+    # Define data augmentation for training data
+    train_transforms = transforms.Compose([
+        transforms.RandomHorizontalFlip(),  # Randomly flip the image horizontally
+        transforms.RandomRotation(10),     # Randomly rotate the image by up to 10 degrees
+        transforms.RandomCrop(32, padding=4),  # Randomly crop with padding
+        transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2),  # Adjust brightness, etc.
+        transforms.ToTensor(),             # Convert image to tensor
+        transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])  # Normalize
+    ])
+
+    # Define transforms for validation/test data (no augmentation here)
+    test_transforms = transforms.Compose([
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
+    ])
+
 
     train_dataset = torchvision.datasets.CIFAR10('./datasets/', train=True, download=True, transform=train_transforms)
     test_dataset = torchvision.datasets.CIFAR10('./datasets/', train=False, download=True, transform=test_transforms)
@@ -123,7 +142,21 @@ if __name__ == '__main__':
     # set up optimizer
     optimizer = optim.SGD(network.parameters(), lr=learning_rate, momentum=momentum)
 
+    model_path = 'models/'
+    if not os.path.exists(model_path):
+        os.mkdir(model_path)
+        
+    PATH = model_path + 'smallcnn_cifar10_epoch30.pth'
+    
+    if len(sys.argv) > 1 and sys.argv[1] == 'load':
+        network.load_state_dict(torch.load(PATH))
+
+
     # training loop
     for epoch in range(1, n_epochs + 1):
         train(network, train_loader, optimizer, epoch, device)
         test(network, test_loader, device)
+
+    # saves model
+    torch.save(network, 'smallcnn_cifar10_epoch30.pth')
+
