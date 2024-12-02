@@ -3,6 +3,8 @@ import pandas as pd
 import torch
 from torchvision.io import read_image
 from torch.utils.data import Dataset
+from torchvision.transforms.functional import convert_image_dtype
+from PIL import Image
 
 class BuildingDataset(Dataset):
     def __init__(self, annotations_file, img_dir, transform=None, target_transform=None):
@@ -16,7 +18,11 @@ class BuildingDataset(Dataset):
 
     def __getitem__(self, idx):
         img_path = os.path.join(self.img_dir, self.img_labels.iloc[idx, 0])
-        image = read_image(img_path)
+        image = Image.open(img_path).convert("RGB")  # Ensure 3-channel RGB format
+        #image = read_image(img_path)
+
+        # Convert image to torch.float32 and scale to [0, 1]
+        #image = convert_image_dtype(image, torch.float)
 
         label = self.img_labels.iloc[idx, 1]
         if self.transform:

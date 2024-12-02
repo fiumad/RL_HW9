@@ -107,20 +107,21 @@ if __name__ == '__main__':
     #train_transforms = torchvision.transforms.Compose([resize, convert, normalize])
     #test_transforms = torchvision.transforms.Compose([resize, convert, normalize])
     # Define data augmentation for training data
+    # Define transforms for training and validation datasets
     train_transforms = transforms.Compose([
-        transforms.RandomHorizontalFlip(),  # Randomly flip the image horizontally
-        transforms.RandomRotation(10),     # Randomly rotate the image by up to 10 degrees
-        transforms.RandomCrop(32, padding=4),  # Randomly crop with padding
-        transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2),  # Adjust brightness, etc.
-        transforms.ToTensor(),             # Convert image to tensor
-        transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])  # Normalize
-    ])
-
-    # Define transforms for validation/test data (no augmentation here)
-    test_transforms = transforms.Compose([
+        transforms.RandomHorizontalFlip(),
+        transforms.RandomRotation(10),
+        transforms.RandomCrop((IMAGE_HEIGHT, IMAGE_WIDTH), padding=4),
+        transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2),
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
-    ])    
+    ])
+
+    test_transforms = transforms.Compose([
+        transforms.Resize((IMAGE_HEIGHT, IMAGE_WIDTH)),  # Ensure consistent size
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
+    ])
 
 
     #data_dir = '/gpfs/u/scratch/RNL2/shared/data'
