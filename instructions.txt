@@ -1,0 +1,25 @@
+ Instructions:
+ Note that the Python files and trained models will be placed in the barn-shared folder three days
+ after the deadline. The project currently contains five Python files, cnn_classification_cifar10.py,
+ dataset.py, model.py, train_buildings.py, test.py
+ Below are the instructions for training the building model on CCI (currently).
+-----------------------------------------------------
+ cd scratch-shared
+
+ ./conda init
+
+ //log in again
+
+ conda activate pytorch-env-shared
+
+ //schedule the code to run
+
+ srun-t 30–gres=gpu:1 python train_buildings.py
+-----------------------------------------------------
+ // To test the pretrained model
+
+ srun-t 30-gres=gpu:1 python test.py <path_to_data_dir> 
+<name_of_label_file.csv>
+
+ //This program will load the trained model (the model we trained before submission) from the
+ models folder, then it will evaluate and print the accuracy on the data in the directory provide
