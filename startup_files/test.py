@@ -70,7 +70,7 @@ def main(dataset_path, labels_file):
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
-        print("Usage: python evaluate_model.py <path_to_new_dataset> <labels_file>")
+        print("Usage: python test.py <path_to_new_dataset> <labels_file>")
         sys.exit(1)
 
     dataset_path = sys.argv[1]
