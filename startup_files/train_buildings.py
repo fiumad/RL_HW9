@@ -180,7 +180,7 @@ if __name__ == '__main__':
     if not os.path.exists(model_path):
         os.mkdir(model_path)
         
-    PATH = model_path + 'cnn_buildings.pth'
+    PATH = model_path + 'cnn_buildings_trained_during_grading.pth'
     
     if len(sys.argv) > 1 and sys.argv[1] == 'load':
         network.load_state_dict(torch.load(PATH))
