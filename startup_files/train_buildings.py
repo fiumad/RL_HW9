@@ -124,8 +124,8 @@ if __name__ == '__main__':
     ])
 
 
-    #data_dir = '/gpfs/u/scratch/RNL2/shared/data'
-    data_dir = r'C:\Users\nievep\Downloads\Reinforcement Learning\Hw9\REPO\RL_HW9\startup_files\datasets\RPI_Buildings_Data\data'
+    data_dir = '/gpfs/u/scratch/RNL2/shared/data'
+    #data_dir = r'C:\Users\nievep\Downloads\Reinforcement Learning\Hw9\REPO\RL_HW9\startup_files\datasets\RPI_Buildings_Data\data'
     train_labels_dir = os.path.join(data_dir, 'train_labels.csv')
     val_labels_dir = os.path.join(data_dir, 'val_labels.csv')
 
