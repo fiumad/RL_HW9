@@ -99,13 +99,10 @@ if __name__ == '__main__':
     new_h = int(IMAGE_HEIGHT / resize_factor)
     new_w = int(IMAGE_WIDTH / resize_factor)
 
-    # feel free to change the hardcoded numbers -- they are from the CIFAR10 code
     normalize = torchvision.transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.225, 0.225, 0.225])
     resize = torchvision.transforms.Resize(size = (new_h, new_w))
     convert = torchvision.transforms.ConvertImageDtype(torch.float)
-    
-    #train_transforms = torchvision.transforms.Compose([resize, convert, normalize])
-    #test_transforms = torchvision.transforms.Compose([resize, convert, normalize])
+
     # Define data augmentation for training data
     # Define transforms for training and validation datasets
     train_transforms = transforms.Compose([
@@ -172,6 +169,9 @@ if __name__ == '__main__':
     test_loader = torch.utils.data.DataLoader(val_dataset, batch_size=test_batch_size, shuffle=False)
 
     network = CNN(in_dim=input_dim, out_dim=out_dim)
+    total_params = sum(p.numel() for p in network.parameters() if p.requires_grad)
+    print(f"Total parameters: {total_params}")
+
     network = network.to(device)
 
     optimizer = optim.SGD(network.parameters(), lr=learning_rate, momentum=momentum)

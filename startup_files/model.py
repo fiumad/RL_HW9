@@ -36,94 +36,51 @@ class FC(nn.Module):
 
 class CNN(nn.Module):
 
-    def __init__(self, in_dim, out_dim, num_classes=11):
+    def __init__(self, in_dim, out_dim):
         super().__init__()
 
         self.in_dim = in_dim
         self.out_dim = out_dim
+
+        self.fc_layer_neurons = 10
+
+        # First Convolutional Layer
+        self.layer1_filters = 10
+        self.layer1_kernel_size = (4, 4)
+        self.layer1_stride = 1
+        self.layer1_padding = 0
+
+        #NB: these calculations assume:
+        #1) padding is 0;
+        #2) stride is picked such that the last step ends on the last pixel, i.e., padding is not used
+        self.layer1_dim_h = (self.in_dim[1] - self.layer1_kernel_size[0]) // self.layer1_stride + 1
+        self.layer1_dim_w = (self.in_dim[2] - self.layer1_kernel_size[1]) // self.layer1_stride + 1
+
+        self.conv1 = nn.Conv2d(3, self.layer1_filters, self.layer1_kernel_size, stride=self.layer1_stride, padding=self.layer1_padding)
+
         
-        # Convolutional layers with reduced filters
-        self.conv1 = nn.Conv2d(3, 32, kernel_size=3, stride=1, padding=1)  # Input: 3 channels, Output: 32 filters
-        self.conv2 = nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1)  # Input: 32 filters, Output: 64 filters
-        self.conv3 = nn.Conv2d(64, 128, kernel_size=3, stride=1, padding=1)  # Input: 64 filters, Output: 128 filters
 
-        # Batch normalization layers
-        self.bn1 = nn.BatchNorm2d(32)
-        self.bn2 = nn.BatchNorm2d(64)
-        self.bn3 = nn.BatchNorm2d(128)
-
-        # Global Average Pooling
-        self.gap = nn.AdaptiveAvgPool2d(1)  # Output: 128 channels, spatial size reduced to 1x1
-        
-        # Fully connected layers
-        self.fc1 = nn.Linear(128, 128)  # Input: 128 (from GAP), Output: 128
-        self.fc2 = nn.Linear(128, num_classes)  # Input: 128, Output: number of classes (11)
-        """ self.in_dim = in_dim
-        self.out_dim = out_dim
-
-        # Convolutional layers
-        self.conv1 = nn.Conv2d(in_channels=3, out_channels=64, kernel_size=3, stride=1, padding=1)
-        self.conv2 = nn.Conv2d(in_channels=64, out_channels=128, kernel_size=3, stride=1, padding=1)
-        self.conv3 = nn.Conv2d(in_channels=128, out_channels=256, kernel_size=3, stride=1, padding=1)
-
-        # Batch normalization layers
-        self.bn1 = nn.BatchNorm2d(64)
-        self.bn2 = nn.BatchNorm2d(128)
-        self.bn3 = nn.BatchNorm2d(256)
-
-        # Max pooling layers
-        self.pool = nn.MaxPool2d(kernel_size=2, stride=2)
+        # Compute input size for fully connected layer
+        self.fc_inputs = int(self.layer1_filters * self.layer1_dim_h * self.layer1_dim_w)
 
         # Fully connected layers
-        self.fc1 = nn.Linear(256 * (in_dim[1] // 8) * (in_dim[2] // 8), 512)
-        self.fc2 = nn.Linear(512, 128)
-        self.fc3 = nn.Linear(128, out_dim)
-
-        # Dropout
-        self.dropout = nn.Dropout(0.5) """
+        self.lin1 = nn.Linear(self.fc_inputs, self.fc_layer_neurons)
+        self.lin2 = nn.Linear(self.fc_layer_neurons, self.out_dim)
 
     def forward(self, x):
-        # Convolutional layers with activation and pooling
-        x = F.relu(self.bn1(self.conv1(x)))
-        x = F.max_pool2d(x, kernel_size=2, stride=2)  # Downsample by factor of 2
+        # Pass through convolutional layers
+        x = F.relu(self.conv1(x))
+        
+        # Print the shape before flattening
+        print(x.shape)
 
-        x = F.relu(self.bn2(self.conv2(x)))
-        x = F.max_pool2d(x, kernel_size=2, stride=2)  # Downsample by factor of 2
-
-        x = F.relu(self.bn3(self.conv3(x)))
-        x = F.max_pool2d(x, kernel_size=2, stride=2)  # Downsample by factor of 2
-
-        # Global Average Pooling
-        x = self.gap(x)  # Output size: [batch_size, 128, 1, 1]
-        x = x.view(x.size(0), -1)  # Flatten to [batch_size, 128]
-
-        # Fully connected layers
-        x = F.relu(self.fc1(x))
-        x = self.fc2(x)  # No activation; handled by loss function (e.g., CrossEntropyLoss)
-
-        return x
-        """ # Convolutional layer 1
-        x = F.relu(self.bn1(self.conv1(x)))
-        x = self.pool(x)
-
-        # Convolutional layer 2
-        x = F.relu(self.bn2(self.conv2(x)))
-        x = self.pool(x)
-
-        # Convolutional layer 3
-        x = F.relu(self.bn3(self.conv3(x)))
-        x = self.pool(x)
-
-        # Flatten for the fully connected layers
+        # Flatten the convolutional output
         x = x.view(x.size(0), -1)
 
-        # Fully connected layers with dropout
-        x = F.relu(self.fc1(x))
-        x = self.dropout(x)
-        x = F.relu(self.fc2(x))
-        x = self.fc3(x)
-
-        return F.log_softmax(x, dim=1) """
+        # Pass through fully connected layers
+        x = F.relu(self.lin1(x))
+        x = self.lin2(x)
+        return x
 
 class CNN_small(nn.Module):
     def __init__(self, in_dim, out_dim):
