@@ -137,6 +137,8 @@ if __name__ == '__main__':
 
     # create neural network object
     network = CNN_small(in_dim=input_dim, out_dim=out_dim)
+    total_params = sum(p.numel() for p in network.parameters() if p.requires_grad)
+    print(f"Total parameters: {total_params}")
     network = network.to(device)
 
     # set up optimizer

@@ -87,7 +87,7 @@ class CNN(nn.Module):
 
         return F.log_softmax(x, dim=1)
 
-        class CNN_small(nn.Module):
+class CNN_small(nn.Module):
     def __init__(self, in_dim, out_dim):
         super().__init__()
 
