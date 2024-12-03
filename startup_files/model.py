@@ -35,7 +35,6 @@ class FC(nn.Module):
         return self.layer_list[self.num_hidden_layers](x)
 
 class CNN(nn.Module):
-
     def __init__(self, in_dim, out_dim):
         super().__init__()
         self.in_dim = in_dim
@@ -56,8 +55,8 @@ class CNN(nn.Module):
 
         # Fully connected layers
         # Adjust input size of fc1 based on reduced feature map size
-        reduced_h = in_dim[1] // 8  # Spatial height after 3 pooling layers
-        reduced_w = in_dim[2] // 8  # Spatial width after 3 pooling layers
+        reduced_h = in_dim[1] // 8  # Spatial height after 4 pooling layers
+        reduced_w = in_dim[2] // 8  # Spatial width after 4 pooling layers
         self.fc1 = nn.Linear(64 * reduced_h * reduced_w, 100)
         self.fc2 = nn.Linear(100, 64)
         self.fc3 = nn.Linear(64, out_dim)
@@ -91,12 +90,10 @@ class CNN_small(nn.Module):
     def __init__(self, in_dim, out_dim):
         super().__init__()
 
-        
-
         self.in_dim = in_dim
         self.out_dim = out_dim
 
-        self.fc_layer_neurons = 200
+        self.fc_layer_neurons = 175
 
         # First Convolutional Layer
         self.layer1_filters = 32

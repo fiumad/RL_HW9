@@ -129,16 +129,18 @@ if __name__ == '__main__':
     ])
 
 
-    train_dataset = torchvision.datasets.CIFAR10('./datasets/', train=True, download=True, transform=train_transforms)
-    test_dataset = torchvision.datasets.CIFAR10('./datasets/', train=False, download=True, transform=test_transforms)
+    train_dataset = torchvision.datasets.CIFAR10('/gpfs/u/home/RNL2/RNL2fmrd/barn-shared/startup_files/datasets/', train=True, download=False, transform=train_transforms)
+    test_dataset = torchvision.datasets.CIFAR10('/gpfs/u/home/RNL2/RNL2fmrd/barn-shared/startup_files/datasets/', train=False, download=False, transform=test_transforms)
 
     train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=train_batch_size, shuffle=True)
     test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=test_batch_size, shuffle=False)
 
     # create neural network object
     network = CNN_small(in_dim=input_dim, out_dim=out_dim)
+    
     total_params = sum(p.numel() for p in network.parameters() if p.requires_grad)
     print(f"Total parameters: {total_params}")
+
     network = network.to(device)
 
     # set up optimizer
